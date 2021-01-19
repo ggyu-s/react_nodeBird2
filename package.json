@@ -10,10 +10,14 @@
   "author": "ggyu",
   "license": "ISC",
   "dependencies": {
+    "@ant-design/icons": "^4.3.0",
+    "antd": "^4.10.3",
+    "babel-plugin-styled-components": "^1.12.0",
     "next": "^9.5.5",
     "prop-types": "^15.7.2",
     "react": "^17.0.1",
-    "react-dom": "^17.0.1"
+    "react-dom": "^17.0.1",
+    "styled-components": "^5.2.1"
   },
   "devDependencies": {
     "eslint": "^7.18.0",
