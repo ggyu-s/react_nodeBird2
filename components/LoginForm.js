@@ -1,10 +1,10 @@
 import { Button, Input } from "antd";
 import Form from "antd/lib/form/Form";
 import Link from "next/link";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import styled from "styled-components";
 import PropTypes from "prop-types";
-import useInput from "../hooks/useInput";
+import UseInput from "../hooks/useInput";
 
 const ButtonWrapper = styled(Button)`
   margin-top: 10px;
@@ -14,8 +14,8 @@ const FormWrapper = styled(Form)`
 `;
 
 const LoginForm = ({ setIsLoggedIn }) => {
-  const [id, onChangeId] = useInput("");
-  const [password, onChangePassword] = useInput("");
+  const [id, onChangeId] = UseInput("");
+  const [password, onChangePassword] = UseInput("");
 
   // preventDefault() 함수를 내장하고 있음.
   const onSubmitForm = useCallback(() => {

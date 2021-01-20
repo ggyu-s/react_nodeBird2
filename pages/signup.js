@@ -2,7 +2,7 @@ import { Button, Checkbox, Form, Input } from "antd";
 import Head from "next/head";
 import React, { useCallback, useState } from "react";
 import AppLayout from "../components/AppLayout";
-import useInput from "../hooks/useInput";
+import UseInput from "../hooks/useInput";
 import styled from "styled-components";
 
 const ErrorMessage = styled.div`
@@ -10,9 +10,9 @@ const ErrorMessage = styled.div`
 `;
 
 const Signup = () => {
-  const [id, onChangeId] = useInput("");
-  const [nickname, onChangeNickname] = useInput("");
-  const [password, onChangePassword] = useInput("");
+  const [id, onChangeId] = UseInput("");
+  const [nickname, onChangeNickname] = UseInput("");
+  const [password, onChangePassword] = UseInput("");
   const [passwordCheck, setPasswordCheck] = useState("");
   const [passwordError, setPasswordError] = useState(false);
 
