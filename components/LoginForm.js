@@ -5,7 +5,7 @@ import { useCallback } from "react";
 import styled from "styled-components";
 import UseInput from "../hooks/useInput";
 import { useDispatch } from "react-redux";
-import { loginAction } from "../reducers";
+import { loginAction } from "../reducers/user";
 
 const ButtonWrapper = styled(Button)`
   margin-top: 10px;
