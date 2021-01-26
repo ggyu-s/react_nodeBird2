@@ -17,24 +17,24 @@ const FormWrapper = styled(Form)`
 const LoginForm = () => {
   const dispatch = useDispatch();
   const { logInLoading } = useSelector((state) => state.user);
-  const [id, onChangeId] = UseInput("");
+  const [email, onChangeEmail] = UseInput("");
   const [password, onChangePassword] = UseInput("");
 
   // preventDefault() 함수를 내장하고 있음.
   const onSubmitForm = useCallback(() => {
-    console.log(id, password);
-    dispatch(loginRequestAction({ id, password }));
-  }, [id, password]);
+    console.log(email, password);
+    dispatch(loginRequestAction({ email, password }));
+  }, [email, password]);
 
   return (
     <FormWrapper onFinish={onSubmitForm}>
       <div>
-        <label htmlFor="user-id">아이디</label>
+        <label htmlFor="user-email">이메일</label>
         <br />
         <Input
-          name="user-id"
-          value={id}
-          onChange={onChangeId}
+          name="user-email"
+          value={email}
+          onChange={onChangeEmail}
           required
           type="email"
         />
