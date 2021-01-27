@@ -13,6 +13,12 @@ export const initialState = {
   changeNicknameLoading: false,
   changeNicknameDone: false,
   changeNicknameError: null,
+  followLoading: false,
+  followDone: false,
+  followError: null,
+  unFollowLoading: false,
+  unFollowDone: false,
+  unFollowError: null,
   me: null,
   signUpdate: {},
   loginData: {},
@@ -50,16 +56,8 @@ const dummyUser = (data) => ({
   nickname: "제로초",
   id: 1,
   Posts: [{ id: 1 }],
-  Followings: [
-    { nickname: "초초초" },
-    { nickname: "초초초" },
-    { nickname: "초초초" },
-  ],
-  Followers: [
-    { nickname: "초초초" },
-    { nickname: "초초초" },
-    { nickname: "초초초" },
-  ],
+  Followings: [],
+  Followers: [{ nickname: "초" }, { nickname: "초초" }, { nickname: "초초초" }],
 });
 
 export const loginRequestAction = (data) => ({
@@ -133,6 +131,36 @@ const reducer = (state = initialState, action) => {
         break;
       case REMOVE_POST_OF_ME:
         draft.me.Posts = draft.me.Posts.filter((v) => v.id !== action.data);
+        break;
+      case FOLLOW_REQUEST:
+        draft.followLoading = true;
+        draft.followError = null;
+        draft.followDone = false;
+        break;
+      case FOLLOW_SUCCESS:
+        draft.followLoading = false;
+        draft.followDone = true;
+        draft.me.Followings.push({ id: action.data });
+        break;
+      case FOLLOW_FAILURE:
+        draft.followLoading = false;
+        draft.followError = action.data;
+        break;
+      case UNFOLLOW_REQUEST:
+        draft.unFollowLoading = true;
+        draft.unFollowError = null;
+        draft.unFollowDone = false;
+        break;
+      case UNFOLLOW_SUCCESS:
+        draft.unFollowLoading = false;
+        draft.unFollowDone = true;
+        draft.me.Followings = draft.me.Followings.filter(
+          (v) => v.id !== action.data
+        );
+        break;
+      case UNFOLLOW_FAILURE:
+        draft.unFollowLoading = false;
+        draft.unFollowError = action.data;
         break;
       default:
         break;

@@ -3,57 +3,12 @@ import shortid from "shortid";
 import faker from "faker";
 
 export const initialState = {
-  mainPosts: [
-    {
-      id: 1,
-      User: {
-        id: 1,
-        nickname: "제로초",
-      },
-      content: "첫 번째 게시글 #해시태그 #익스프레스",
-      Images: [
-        {
-          id: shortid.generate(),
-          src:
-            "https://cdn.crowdpic.net/detail-thumb/thumb_d_592B8E154069E30E7D76116EF215655F.jpg",
-        },
-        {
-          id: shortid.generate(),
-          src:
-            "https://previews.123rf.com/images/mtaira/mtaira1612/mtaira161200055/69760183-%EA%B0%80%EB%82%98%EC%9E%90%EC%99%80-%EC%9D%BC%EB%B3%B8%EC%9D%98-%EC%A0%84%ED%86%B5%EC%A0%81%EC%9D%B8-%EC%9D%BC%EB%B3%B8-%ED%92%8D%EA%B2%BD.jpg",
-        },
-        {
-          id: shortid.generate(),
-          src:
-            "https://previews.123rf.com/images/sepavo/sepavo1708/sepavo170800052/83930497-%EC%98%A4%EC%82%AC%EC%B9%B4-%EC%9D%BC%EB%B3%B8-%ED%92%8D%EA%B2%BD%EA%B3%BC-%EC%84%B1%EC%9E%85%EB%8B%88%EB%8B%A4-.jpg",
-        },
-      ],
-      Comments: [
-        {
-          id: shortid.generate(),
-          User: {
-            nickname: "nero",
-          },
-          content: "이쁘네요~~",
-        },
-        {
-          id: shortid.generate(),
-          User: {
-            nickname: "japen",
-          },
-          content: "일본 가고 싶어지네요!!!",
-        },
-        {
-          id: shortid.generate(),
-          User: {
-            nickname: "gogogogo",
-          },
-          content: "온천 가고 싶어요~!",
-        },
-      ],
-    },
-  ],
+  mainPosts: [],
   imagePaths: [],
+  hasMorePost: true,
+  loadPostLoading: false,
+  loadPostDone: false,
+  loadPostError: null,
   addPostLoading: false,
   addPostDone: false,
   addPostError: null,
@@ -65,10 +20,10 @@ export const initialState = {
   addCommentError: null,
 };
 
-initialState.mainPosts = initialState.mainPosts.concat(
-  Array(20)
+export const generateDummyPost = (number) =>
+  Array(number)
     .fill()
-    .map((v, i) => ({
+    .map(() => ({
       id: shortid.generate(),
       User: {
         id: shortid.generate(),
@@ -89,8 +44,11 @@ initialState.mainPosts = initialState.mainPosts.concat(
           content: faker.lorem.sentence(),
         },
       ],
-    }))
-);
+    }));
+
+export const LOAD_POST_REQUEST = "LOAD_POST_REQUEST";
+export const LOAD_POST_SUCCESS = "LOAD_POST_SUCCESS";
+export const LOAD_POST_FAILURE = "LOAD_POST_FAILURE";
 
 export const ADD_POST_REQUEST = "ADD_POST_REQUEST";
 export const ADD_POST_SUCCESS = "ADD_POST_SUCCESS";
@@ -137,6 +95,21 @@ const dummyComment = (data) => ({
 const reducer = (state = initialState, action) => {
   return produce(state, (draft) => {
     switch (action.type) {
+      case LOAD_POST_REQUEST:
+        draft.loadPostLoading = true;
+        draft.loadPostDone = false;
+        draft.loadPostError = null;
+        break;
+      case LOAD_POST_SUCCESS:
+        draft.loadPostLoading = false;
+        draft.loadPostDone = true;
+        draft.mainPosts = action.data.concat(draft.mainPosts);
+        draft.hasMorePost = draft.mainPosts.length < 50;
+        break;
+      case LOAD_POST_FAILURE:
+        draft.loadPostLoading = false;
+        draft.loadPostError = action.error;
+        break;
       case ADD_POST_REQUEST:
         draft.addPostLoading = true;
         draft.addPostDone = false;
