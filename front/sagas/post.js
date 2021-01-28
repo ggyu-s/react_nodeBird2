@@ -16,7 +16,11 @@ import {
   REMOVE_POST_REQUEST,
   REMOVE_POST_SUCCESS,
 } from "../reducers/post";
-import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from "../reducers/user";
+import {
+  ADD_POST_TO_ME,
+  REMOVE_POST_OF_ME,
+  SIGN_UP_DONE_INTIT,
+} from "../reducers/user";
 
 function loadPostAPI(data) {
   return axios.post("/api/posts", data);
@@ -29,6 +33,9 @@ function* loadPost(action) {
     yield put({
       type: LOAD_POST_SUCCESS,
       data: generateDummyPost(10),
+    });
+    yield put({
+      type: SIGN_UP_DONE_INTIT,
     });
   } catch (err) {
     console.log("err", err);

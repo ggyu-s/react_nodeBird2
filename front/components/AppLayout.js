@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import Link from "next/link";
 import { Col, Input, Menu, Row } from "antd";
@@ -23,7 +23,7 @@ const Global = createGlobalStyle`
 `;
 
 const AppLayout = ({ children }) => {
-  const { logInDone } = useSelector((state) => state.user);
+  const { logInDone, signUpDone } = useSelector((state) => state.user);
   return (
     <div>
       <Global />
