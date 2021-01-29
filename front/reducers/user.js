@@ -54,11 +54,11 @@ export const SIGN_UP_DONE_INTIT = "SIGN_UP_DONE_INTIT";
 
 const dummyUser = (data) => ({
   ...data,
-  nickname: "제로초",
-  id: 1,
-  Posts: [{ id: 1 }],
+  nickname: data.nickname,
+  id: data.id,
+  Posts: [],
   Followings: [],
-  Followers: [{ nickname: "초" }, { nickname: "초초" }, { nickname: "초초초" }],
+  Followers: [],
 });
 
 export const loginRequestAction = (data) => ({
@@ -90,6 +90,7 @@ const reducer = (state = initialState, action) => {
       case LOG_OUT_REQUEST:
         draft.logOutLoading = true;
         draft.logOutDone = false;
+        draft.logInDone = false;
         draft.logOutError = null;
         break;
       case LOG_OUT_SUCCESS:
