@@ -1,7 +1,7 @@
 import { Button, Input } from "antd";
 import Form from "antd/lib/form/Form";
 import Link from "next/link";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import styled from "styled-components";
 import UseInput from "../hooks/useInput";
 import { useDispatch, useSelector } from "react-redux";
@@ -16,9 +16,15 @@ const FormWrapper = styled(Form)`
 
 const LoginForm = () => {
   const dispatch = useDispatch();
-  const { logInLoading } = useSelector((state) => state.user);
+  const { logInLoading, logInError } = useSelector((state) => state.user);
   const [email, onChangeEmail] = UseInput("");
   const [password, onChangePassword] = UseInput("");
+
+  useEffect(() => {
+    if (logInError) {
+      alert(logInError);
+    }
+  }, [logInError]);
 
   // preventDefault() 함수를 내장하고 있음.
   const onSubmitForm = useCallback(() => {

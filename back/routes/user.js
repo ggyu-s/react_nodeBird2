@@ -1,8 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
-const { User } = require("../models");
+const { User, Post } = require("../models");
 const passport = require("passport");
+const { route } = require("./post");
+const db = require("../models");
 
 router.post("/login", (req, res, next) => {
   passport.authenticate("local", (err, user, info) => {
@@ -15,11 +17,31 @@ router.post("/login", (req, res, next) => {
       return res.status(403).send(info.reason);
     }
     return req.login(user, async (loginErr) => {
-      console.log(user);
       if (loginErr) {
         return next(loginErr);
       }
-      return res.status(200).json(user);
+      const fullUserWithoutPassword = await User.findOne({
+        where: {
+          id: user.id,
+        },
+        attributes: {
+          exclude: ["password"],
+        },
+        include: [
+          {
+            model: Post,
+          },
+          {
+            model: User,
+            as: "Followings",
+          },
+          {
+            model: User,
+            as: "Followers",
+          },
+        ],
+      });
+      return res.status(200).json(fullUserWithoutPassword);
     });
   })(req, res, next);
 });
@@ -46,6 +68,12 @@ router.post("/", async (req, res, next) => {
     console.error(error);
     next(error);
   }
+
+  route.post("/logout", (req, res) => {
+    req.logout();
+    req.session.destroy();
+    res.send("ok");
+  });
 });
 
 module.exports = router;
