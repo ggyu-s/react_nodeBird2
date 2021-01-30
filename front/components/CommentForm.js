@@ -18,7 +18,7 @@ function CommentForm({ post }) {
   }, [addCommentDone]);
 
   const onSubmitComment = useCallback(() => {
-    console.log(post.id, commentText);
+    console.log(post.id, commentText, id);
     dispatch({
       type: ADD_COMMENT_REQUEST,
       data: { content: commentText, postId: post.id, userId: id },

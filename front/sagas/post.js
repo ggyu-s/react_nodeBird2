@@ -1,6 +1,13 @@
 import axios from "axios";
-import { all, call, delay, fork, put, takeLatest } from "redux-saga/effects";
-import shortid from "shortid";
+import {
+  all,
+  call,
+  delay,
+  fork,
+  put,
+  takeLatest,
+  throttle,
+} from "redux-saga/effects";
 import {
   ADD_COMMENT_FAILURE,
   ADD_COMMENT_REQUEST,
@@ -8,13 +15,18 @@ import {
   ADD_POST_FAILURE,
   ADD_POST_REQUEST,
   ADD_POST_SUCCESS,
-  generateDummyPost,
+  LIKE_POST_FAILURE,
+  LIKE_POST_REQUEST,
+  LIKE_POST_SUCCESS,
   LOAD_POST_FAILURE,
   LOAD_POST_REQUEST,
   LOAD_POST_SUCCESS,
   REMOVE_POST_FAILURE,
   REMOVE_POST_REQUEST,
   REMOVE_POST_SUCCESS,
+  UNLIKE_POST_FAILURE,
+  UNLIKE_POST_REQUEST,
+  UNLIKE_POST_SUCCESS,
 } from "../reducers/post";
 import {
   ADD_POST_TO_ME,
@@ -23,16 +35,15 @@ import {
 } from "../reducers/user";
 
 function loadPostAPI(data) {
-  return axios.post("/api/posts", data);
+  return axios.get("/posts", data);
 }
 
 function* loadPost(action) {
   try {
-    // const result = yield call(addPostAPI, action.data);
-    yield delay(1000);
+    const result = yield call(loadPostAPI, action.data);
     yield put({
       type: LOAD_POST_SUCCESS,
-      data: generateDummyPost(10),
+      data: result.data,
     });
     yield put({
       type: SIGN_UP_DONE_INTIT,
@@ -47,24 +58,19 @@ function* loadPost(action) {
 }
 
 function addPostAPI(data) {
-  return axios.post("/api/addpost", data);
+  return axios.post("/post", { content: data });
 }
 
 function* addPost(action) {
   try {
-    // const result = yield call(addPostAPI, action.data);
-    yield delay(1000);
-    const id = shortid.generate();
+    const result = yield call(addPostAPI, action.data);
     yield put({
       type: ADD_POST_SUCCESS,
-      data: {
-        id,
-        content: action.data,
-      },
+      data: result.data,
     });
     yield put({
       type: ADD_POST_TO_ME,
-      data: id,
+      data: result.data.id,
     });
   } catch (err) {
     yield put({
@@ -75,16 +81,15 @@ function* addPost(action) {
 }
 
 function removePostAPI(data) {
-  return axios.post("/api/removePost", data);
+  return axios.delete(`/post/${data}`);
 }
 
 function* removePost(action) {
   try {
-    // const result = yield call(addPostAPI, action.data);
-    yield delay(1000);
+    const result = yield call(removePostAPI, action.data);
     yield put({
       type: REMOVE_POST_SUCCESS,
-      data: action.data,
+      data: result.data,
     });
     yield put({
       type: REMOVE_POST_OF_ME,
@@ -99,18 +104,18 @@ function* removePost(action) {
 }
 
 function addCommentAPI(data) {
-  return axios.post(`/api/${data.postId}/addpost`, data);
+  return axios.post(`/post/${data.postId}/comment`, data);
 }
 
 function* addComment(action) {
   try {
-    // const result = yield call(addCommentAPI, action.data);
-    yield delay(1000);
+    const result = yield call(addCommentAPI, action.data);
     yield put({
       type: ADD_COMMENT_SUCCESS,
-      data: action.data,
+      data: result.data,
     });
   } catch (err) {
+    console.error(err);
     yield put({
       type: ADD_COMMENT_FAILURE,
       data: err.response.data,
@@ -118,8 +123,48 @@ function* addComment(action) {
   }
 }
 
+function likePostAPI(data) {
+  return axios.patch(`/post/${data}/like`);
+}
+
+function* likePost(action) {
+  try {
+    const result = yield call(likePostAPI, action.data);
+    yield put({
+      type: LIKE_POST_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: LIKE_POST_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
+
+function unLikePostAPI(data) {
+  return axios.delete(`/post/${data}/unlike`);
+}
+
+function* unLikePost(action) {
+  try {
+    const result = yield call(unLikePostAPI, action.data);
+    yield put({
+      type: UNLIKE_POST_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: UNLIKE_POST_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
+
 function* watchLoadPost() {
-  yield takeLatest(LOAD_POST_REQUEST, loadPost);
+  yield throttle(5000, LOAD_POST_REQUEST, loadPost);
 }
 
 function* watchAddPost() {
@@ -134,11 +179,21 @@ function* watchAddComment() {
   yield takeLatest(ADD_COMMENT_REQUEST, addComment);
 }
 
+function* watchLikePost() {
+  yield takeLatest(LIKE_POST_REQUEST, likePost);
+}
+
+function* watchUnLikePost() {
+  yield takeLatest(UNLIKE_POST_REQUEST, unLikePost);
+}
+
 export default function* postSaga() {
   yield all([
     fork(watchAddPost),
     fork(watchAddComment),
     fork(watchRemovePost),
     fork(watchLoadPost),
+    fork(watchLikePost),
+    fork(watchUnLikePost),
   ]);
 }

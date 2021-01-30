@@ -1,6 +1,9 @@
 import produce from "immer";
 
 export const initialState = {
+  loadUserLoading: false,
+  loadUserDone: false,
+  loadUserError: null,
   logInLoading: false,
   logInDone: false,
   logInError: null,
@@ -24,6 +27,10 @@ export const initialState = {
   loginData: {},
 };
 
+export const LOAD_USER_REQUEST = "LOAD_USER_REQUEST";
+export const LOAD_USER_SUCCESS = "LOAD_USER_SUCCESS";
+export const LOAD_USER_FAILURE = "LOAD_USER_FAILURE";
+
 export const LOG_IN_REQUEST = "LOG_IN_REQUEST";
 export const LOG_IN_SUCCESS = "LOG_IN_SUCCESS";
 export const LOG_IN_FAILURE = "LOG_IN_FAILURE";
@@ -36,9 +43,9 @@ export const SIGN_UP_REQUEST = "SGIN_UP_REQUEST";
 export const SIGN_UP_SUCCESS = "SGIN_UP_SUCCESS";
 export const SIGN_UP_FAILURE = "SGIN_UP_FAILURE";
 
-export const CHANGE_NICKNAME_REQUEST = "SGIN_UP_REQUEST";
-export const CHANGE_NICKNAME_SUCCESS = "SGIN_UP_SUCCESS";
-export const CHANGE_NICKNAME_FAILURE = "SGIN_UP_FAILURE";
+export const CHANGE_NICKNAME_REQUEST = "CHANGE_NICKNAME_REQUEST";
+export const CHANGE_NICKNAME_SUCCESS = "CHANGE_NICKNAME_SUCCESS";
+export const CHANGE_NICKNAME_FAILURE = "CHANGE_NICKNAME_FAILURE";
 
 export const FOLLOW_REQUEST = "FOLLOW_REQUEST";
 export const FOLLOW_SUCCESS = "FOLLOW_SUCCESS";
@@ -73,6 +80,20 @@ export const logoutRequestAction = () => ({
 const reducer = (state = initialState, action) => {
   return produce(state, (draft) => {
     switch (action.type) {
+      case LOAD_USER_REQUEST:
+        draft.loadUserLoading = true;
+        draft.loadUserError = null;
+        draft.loadUserDone = false;
+        break;
+      case LOAD_USER_SUCCESS:
+        draft.loadUserLoading = false;
+        draft.loadUserDone = true;
+        draft.me = action.data;
+        break;
+      case LOAD_USER_FAILURE:
+        draft.loadUserLoading = false;
+        draft.loadUserError = action.error;
+        break;
       case LOG_IN_REQUEST:
         draft.logInLoading = true;
         draft.logInError = null;
@@ -124,6 +145,7 @@ const reducer = (state = initialState, action) => {
         draft.changeNicknameError = null;
         break;
       case CHANGE_NICKNAME_SUCCESS:
+        draft.me.nickname = action.data.nickname;
         draft.changeNicknameLoading = false;
         draft.changeNicknameDone = true;
         break;
