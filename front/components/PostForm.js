@@ -22,9 +22,12 @@ function PostForm() {
   }, [addPostDone]);
 
   const onSubmit = useCallback(() => {
+    if (!text || !text.trim()) {
+      return alert("게시글을 작성하세요");
+    }
     const formData = new FormData();
     imagePaths.forEach((p) => {
-      formData.append("image", i);
+      formData.append("image", p);
     });
     formData.append("content", text);
     dispatch({
@@ -90,7 +93,7 @@ function PostForm() {
               alt={v}
             />
             <div>
-              <Button onClick={onRemoveImage(i)}>제거</Button>
+              <Button onClick={() => onRemoveImage(i)}>제거</Button>
             </div>
           </div>
         ))}
