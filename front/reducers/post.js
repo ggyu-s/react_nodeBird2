@@ -25,6 +25,9 @@ export const initialState = {
   uploadImagesLoading: false,
   uploadImagesDone: false,
   uploadImagesError: null,
+  retweetLoading: false,
+  retweetDone: false,
+  retweetError: null,
 };
 
 // export const generateDummyPost = (number) =>
@@ -81,6 +84,10 @@ export const UPLOAD_IMAGES_REQUEST = "UPLOAD_IMAGES_REQUEST";
 export const UPLOAD_IMAGES_SUCCESS = "UPLOAD_IMAGES_SUCCESS";
 export const UPLOAD_IMAGES_FAILURE = "UPLOAD_IMAGES_FAILURE";
 
+export const RETWEET_REQUEST = "RETWEET_REQUEST";
+export const RETWEET_SUCCESS = "RETWEET_SUCCESS";
+export const RETWEET_FAILURE = "RETWEET_FAILURE";
+
 export const REMOVE_IMAGE = "REMOVE_IMAGE";
 
 export const addPost = (data) => ({
@@ -92,26 +99,6 @@ export const addComment = (data) => ({
   type: ADD_COMMENT_REQUEST,
   data,
 });
-
-// const dummyPost = (data) => ({
-//   id: data.id,
-//   content: data.content,
-//   User: {
-//     id: 1,
-//     nickname: "원처리",
-//   },
-//   Images: [],
-//   Comments: [],
-// });
-
-// const dummyComment = (data) => ({
-//   id: shortid.generate(),
-//   content: data,
-//   User: {
-//     id: 1,
-//     nickname: "쩌링",
-//   },
-// });
 
 const reducer = (state = initialState, action) => {
   return produce(state, (draft) => {
@@ -156,8 +143,8 @@ const reducer = (state = initialState, action) => {
       case LOAD_POST_SUCCESS:
         draft.loadPostLoading = false;
         draft.loadPostDone = true;
-        draft.mainPosts = action.data.concat(draft.mainPosts);
-        draft.hasMorePost = draft.mainPosts.length < 50;
+        draft.mainPosts = draft.mainPosts.concat(action.data);
+        draft.hasMorePost = draft.mainPosts.length === 10;
         break;
       case LOAD_POST_FAILURE:
         draft.loadPostLoading = false;
@@ -224,6 +211,20 @@ const reducer = (state = initialState, action) => {
       case UPLOAD_IMAGES_FAILURE:
         draft.uploadImagesLoading = false;
         draft.uploadImagesError = action.error;
+        break;
+      case RETWEET_REQUEST:
+        draft.retweetLoading = true;
+        draft.retweetError = null;
+        draft.retweetDone = false;
+        break;
+      case RETWEET_SUCCESS:
+        draft.retweetLoading = false;
+        draft.retweetDone = true;
+        draft.mainPosts.unshift(action.data);
+        break;
+      case RETWEET_FAILURE:
+        draft.retweetLoading = false;
+        draft.retweetError = action.data;
         break;
       case REMOVE_IMAGE:
         draft.imagePaths = draft.imagePaths.filter((v, i) => i !== action.data);
