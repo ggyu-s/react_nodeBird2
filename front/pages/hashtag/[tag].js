@@ -7,18 +7,17 @@ import { useDispatch, useSelector } from "react-redux";
 import { END } from "redux-saga";
 import AppLayout from "../../components/AppLayout";
 import PostCard from "../../components/PostCard";
-import { LOAD_USER_POSTS_REQUEST } from "../../reducers/post";
-import { LOAD_MY_INFO_REQUEST, LOAD_USER_REQUEST } from "../../reducers/user";
+import { LOAD_HASHTAG_POSTS_REQUEST } from "../../reducers/post";
+import { LOAD_MY_INFO_REQUEST } from "../../reducers/user";
 import wrapper from "../../store/configureStore";
 
 function User() {
   const dispatch = useDispatch();
   const router = useRouter();
-  const { id } = router.query;
+  const { tag } = router.query;
   const { mainPosts, hasMorePost, loadPostLoading } = useSelector(
     (state) => state.post
   );
-  const { userInfo } = useSelector((state) => state.user);
 
   useEffect(() => {
     function onScroll() {
@@ -28,11 +27,11 @@ function User() {
       if (y + ch > sh - 200) {
         if (hasMorePost && !loadPostLoading) {
           dispatch({
-            type: LOAD_USER_POSTS_REQUEST,
+            type: LOAD_HASHTAG_POSTS_REQUEST,
             lastId:
               mainPosts[mainPosts.length - 1] &&
               mainPosts[mainPosts.length - 1].id,
-            data: id,
+            data: tag,
           });
         }
       }
@@ -41,45 +40,10 @@ function User() {
     return () => {
       window.removeEventListener("scroll", onScroll);
     };
-  }, [hasMorePost, id, mainPosts.length, loadPostLoading]);
+  }, [hasMorePost, mainPosts.length, loadPostLoading]);
 
   return (
     <AppLayout>
-      <Head>
-        <title>{userInfo.nickname} 님의 글</title>
-        <meta name="description" content={userInfo.content} />
-        <meta property="og:title" content={`${userInfo.nickname}님의 게시글`} />
-        <meta property="og:description" content={userInfo.content} />
-        <meta property="og:image" content={"https//nodebird.com/favicon.ico"} />
-        <meta property="og:url" content={`https://nodebird.com/post/${id}`} />
-      </Head>
-      {userInfo ? (
-        <Card
-          actions={[
-            <div key="twit">
-              짹짹
-              <br />
-              {userInfo.Posts}
-            </div>,
-            <div key="following">
-              팔로잉
-              <br />
-              {userInfo.Followings}
-            </div>,
-            <div key="follower">
-              팔로워
-              <br />
-              {userInfo.Followers}
-            </div>,
-          ]}
-        >
-          <Card.Meta
-            avatar={<Avatar>{userInfo.nickname[0]}</Avatar>}
-            title={userInfo.nickname}
-            description="노드버드 매니아"
-          />
-        </Card>
-      ) : null}
       {mainPosts.map((c) => (
         <PostCard key={c.id} post={c} />
       ))}
@@ -94,15 +58,11 @@ export const getServerSideProps = wrapper.getServerSideProps(
       axios.defaults.headers.Cookie = cookie;
     }
     context.store.dispatch({
-      type: LOAD_USER_POSTS_REQUEST,
+      type: LOAD_HASHTAG_POSTS_REQUEST,
       data: context.params.id,
     });
     context.store.dispatch({
       type: LOAD_MY_INFO_REQUEST,
-    });
-    context.store.dispatch({
-      type: LOAD_USER_REQUEST,
-      data: context.params.id,
     });
     context.store.dispatch(END);
     await context.store.sagaTask.toPromise();

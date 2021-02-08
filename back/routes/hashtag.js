@@ -1,5 +1,7 @@
 const express = require("express");
-const hashtag = require("../models/hashtag");
+const { Op } = require("sequelize");
+
+const { Hashtag, User, Image, Comment, Post } = require("../models");
 const router = express.Router();
 
 router.get("/:hashtag", async (req, res, next) => {
@@ -17,8 +19,8 @@ router.get("/:hashtag", async (req, res, next) => {
       ],
       include: [
         {
-          model: hashtag,
-          where: { name: req.params.hashtag },
+          model: Hashtag,
+          where: { name: decodeURIComponent(req.params.hashtag) },
         },
         {
           model: User,

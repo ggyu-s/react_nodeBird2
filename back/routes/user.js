@@ -2,9 +2,10 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const passport = require("passport");
+const { Op } = require("sequelize");
 
 const { isLoggedIn, isNotLoggedIn } = require("./middlewares");
-const { User, Post } = require("../models");
+const { User, Post, Image, Comment } = require("../models");
 const db = require("../models");
 
 router.get("/", async (req, res, next) => {
